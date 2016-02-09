@@ -6,4 +6,8 @@ $(document).ready(function(){
     $("#browse").click(function(e) {
         $('input[type=file]').click();
     })
+
+    $("#submitButton").click(function() {
+        $('#submit').click();
+    })
 });

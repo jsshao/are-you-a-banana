@@ -54,3 +54,8 @@ table tr td:last-child {
 {
     display: none;
 }
+
+#submit
+{
+    display: none;
+}
