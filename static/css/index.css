@@ -24,9 +24,6 @@ table tr td:last-child {
   color: #222;
   border-color: #222;
 }
-
-
-
 .image-preview-input {
     position: relative;
     overflow: hidden;
@@ -58,4 +55,25 @@ table tr td:last-child {
 #submit
 {
     display: none;
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 75;
+}
+
+#myCarousel {
+    width: 100%;
+    height: 400px;
+}
+
+.carousel-inner > .item > img {
+    width: 100%;
+    height: 400px;
+}
+
+.caption {
+    margin-top: 20px;
 }

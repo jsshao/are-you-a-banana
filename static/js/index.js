@@ -1,6 +1,11 @@
 $(document).ready(function(){
-    $("#uploader").change(function() {
-        $("#path").val($("#uploader").val().split('\\').pop());
+    $("#uploader").change(function(e) {
+        var files = e.target.files;
+        var list = "";
+        for (var i = 0; i < files.length; i++) {
+          list += files[i].name + ", "
+        }
+        $("#path").val(list);
     });
 
     $("#browse").click(function(e) {

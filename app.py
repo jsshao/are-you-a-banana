@@ -3,6 +3,7 @@ import uuid
 import matplotlib.pyplot as pl
 import numpy as np
 import pandas as pd
+from flask import after_this_request
 from flask import Flask
 from flask import redirect
 from flask import render_template
@@ -31,17 +32,29 @@ def showImg(filename):
 
 @app.route('/upload', methods=['POST'])
 def upload():
-    file = request.files['input-img']
-    if file and file.filename.endswith(ACCEPTED_EXTENSIONS):
-        unique_filename = str(uuid.uuid4())
-        unique_path = os.path.join(UPLOAD_DIR, unique_filename)
-        try:
+    files = request.files.getlist("input-img")
+    valid_file_names = []
+    valid_file_paths = []
+    for file in files:
+        if file and file.filename.endswith(ACCEPTED_EXTENSIONS):
+            unique_filename = str(uuid.uuid4())
+            unique_path = os.path.join(UPLOAD_DIR, unique_filename)
             file.save(unique_path)
-            predictions = test([unique_path])
-            return render_template("result.html", uploaded_img=unique_filename)
-        finally:
-            pass
-            #os.remove(unique_filename)
+            valid_file_paths.append(unique_path)
+            valid_file_names.append(unique_filename)
+
+    predictions = test(valid_file_paths)
+    return render_template("result.html", uploaded_imgs=zip(valid_file_names, predictions))
+
+@app.route('/delete/<filename>', methods=['POST'])
+def deleteImg(filename):
+    path = os.path.join(UPLOAD_DIR, filename)
+    try:
+        os.remove(path)
+    except:
+        pass
+    return "deleted"
+
 
 def img_to_matrix(filename):
     img = Image.open(filename)
@@ -69,7 +82,7 @@ def visualize():
 
 def train():
     images = [IMG_DIR + f for f in os.listdir(IMG_DIR) if f.endswith(ACCEPTED_EXTENSIONS)]
-    labels = ["banana" if "banana" in f.split('/')[-1] else "human" for f in images]
+    labels = ["Banana" if "banana" in f.split('/')[-1] else "Human" for f in images]
     data = []
     for image in images:
         img = img_to_matrix(image)
