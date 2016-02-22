@@ -77,3 +77,25 @@ table tr td:last-child {
 .caption {
     margin-top: 20px;
 }
+
+#footerDiv {
+    margin-left: auto;
+    margin-right: auto;
+    width: 155px;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  }

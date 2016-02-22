@@ -1,15 +1,18 @@
+import ast
 import os
 import uuid
 import matplotlib.pyplot as pl
 import numpy as np
 import pandas as pd
 from flask import after_this_request
+from flask import jsonify
 from flask import Flask
 from flask import redirect
 from flask import render_template
 from flask import request
 from flask import send_from_directory
 from flask import url_for
+from json import loads
 from PIL import Image
 from sklearn.decomposition import RandomizedPCA
 from sklearn.neighbors import KNeighborsClassifier
@@ -44,7 +47,14 @@ def upload():
             valid_file_names.append(unique_filename)
 
     predictions = test(valid_file_paths)
+    return jsonify(**dict(zip(valid_file_names, predictions)))
     return render_template("result.html", uploaded_imgs=zip(valid_file_names, predictions))
+
+@app.route('/result', methods=['POST'])
+def display():
+    html = ast.literal_eval(request.form['html'])
+    json = ast.literal_eval(html)
+    return render_template('result.html', uploaded_imgs=json.items())
 
 @app.route('/delete/<filename>', methods=['POST'])
 def deleteImg(filename):
