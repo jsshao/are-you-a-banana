@@ -1,9 +1,10 @@
 import ast
 import os
+import pickle
 import uuid
-import matplotlib.pyplot as pl
+#import matplotlib.pyplot as pl
 import numpy as np
-import pandas as pd
+#import pandas as pd
 from flask import after_this_request
 from flask import jsonify
 from flask import Flask
@@ -113,5 +114,11 @@ def test(images=['static/images/banana_6.png']):
     return knn.predict(test)
 
 if __name__ == '__main__':
-    train()
+    if os.path.exists('cache.p'):
+        with open('cache.p', 'rb') as cache_file:
+            pca, knn = pickle.load(cache_file)
+    else:
+        train()
+        with open('cache.p', 'wb') as cache_file:
+            pickle.dump((pca, knn), cache_file) 
     app.run(debug=True)
