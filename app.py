@@ -113,7 +113,8 @@ def test(images=['static/images/banana_6.png']):
     test = pca.transform(test)
     return knn.predict(test)
 
-if __name__ == '__main__':
+def main():
+    global pca, knn
     if os.path.exists('cache.p'):
         with open('cache.p', 'rb') as cache_file:
             pca, knn = pickle.load(cache_file)
@@ -122,3 +123,6 @@ if __name__ == '__main__':
         with open('cache.p', 'wb') as cache_file:
             pickle.dump((pca, knn), cache_file) 
     app.run(debug=True)
+
+if __name__ == '__main__':
+    main()
