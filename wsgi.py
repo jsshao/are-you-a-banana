@@ -18,27 +18,31 @@ from PIL import Image
 from sklearn.decomposition import RandomizedPCA
 from sklearn.neighbors import KNeighborsClassifier
 
-app = Flask(__name__)
+application = Flask(__name__)
 STANDARD_SIZE = (300, 167)
 IMG_DIR = "static/images/"
 UPLOAD_DIR = "uploads"
 ACCEPTED_EXTENSIONS = (".png", ".jpg", ".jpeg")
 pca = RandomizedPCA(n_components=5)
 knn = KNeighborsClassifier()
+initialized = False
 
-@app.route('/')
+@application.route('/')
 def home():
+    if not initialized:
+        setup()
     return render_template('index.html')
 
-@app.route('/uploads/<filename>')
+@application.route('/uploads/<filename>')
 def showImg(filename):
     return send_from_directory(UPLOAD_DIR, filename)
 
-@app.route('/upload', methods=['POST'])
+@application.route('/upload', methods=['POST'])
 def upload():
     files = request.files.getlist("input-img")
     valid_file_names = []
     valid_file_paths = []
+
     for file in files:
         if file and file.filename.endswith(ACCEPTED_EXTENSIONS):
             unique_filename = str(uuid.uuid4())
@@ -49,15 +53,14 @@ def upload():
 
     predictions = test(valid_file_paths)
     return jsonify(**dict(zip(valid_file_names, predictions)))
-    return render_template("result.html", uploaded_imgs=zip(valid_file_names, predictions))
 
-@app.route('/result', methods=['POST'])
+@application.route('/result', methods=['POST'])
 def display():
     html = ast.literal_eval(request.form['html'])
     json = ast.literal_eval(html)
     return render_template('result.html', uploaded_imgs=json.items())
 
-@app.route('/delete/<filename>', methods=['POST'])
+@application.route('/delete/<filename>', methods=['POST'])
 def deleteImg(filename):
     path = os.path.join(UPLOAD_DIR, filename)
     try:
@@ -110,11 +113,15 @@ def test(images=['static/images/banana_6.png']):
         img = flatten_image(img)
         test.append(img)
     test = np.array(test)
-    test = pca.transform(test)
+    try:
+	test = pca.transform(test)
+    except Exception as e:
+        print e 
+    print test
     return knn.predict(test)
 
-def main():
-    global pca, knn
+def setup():
+    global pca, knn, initialized
     if os.path.exists('cache.p'):
         with open('cache.p', 'rb') as cache_file:
             pca, knn = pickle.load(cache_file)
@@ -122,7 +129,7 @@ def main():
         train()
         with open('cache.p', 'wb') as cache_file:
             pickle.dump((pca, knn), cache_file) 
-    app.run(debug=True)
+    initialized = True
 
 if __name__ == '__main__':
-    main()
+    application.run(debug=True)
