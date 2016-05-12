@@ -75,6 +75,7 @@ def img_to_matrix(filename):
     img = img.resize(STANDARD_SIZE)
     img = list(img.getdata())
     img = map(list, img)
+    img = [l[:3] for l in img]
     img = np.array(img)
     return img
 
@@ -117,7 +118,6 @@ def test(images=['static/images/banana_6.png']):
 	test = pca.transform(test)
     except Exception as e:
         print e 
-    print test
     return knn.predict(test)
 
 def setup():
